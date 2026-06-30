@@ -1,0 +1,382 @@
+import 'package:otax/core/anime/providers/types.dart';
+import 'package:otax/core/app/logging.dart';
+import 'package:otax/core/app/runtimeDatas.dart';
+import 'package:otax/core/commons/extractQuality.dart';
+import 'package:otax/core/commons/utils.dart';
+import 'package:otax/core/data/preferences.dart';
+import 'package:otax/core/database/aniskip/aniskip.dart';
+import 'package:otax/core/database/database.dart';
+import 'package:otax/core/database/types.dart';
+import 'package:otax/ui/models/sources.dart';
+import 'package:otax/ui/models/widgets/subtitles/subtitleSettings.dart';
+import 'package:flutter/material.dart';
+
+
+class PlayerDataProvider extends ChangeNotifier {
+  PlayerDataProviderState _state;
+  List<EpisodeDetails> epLinks;
+  String showTitle; // Title of the anime
+  String? coverImageUrl;
+  int showId; // Id of the anime
+  String selectedSource;
+  int startIndex; // Index of episode to start from
+  List<AlternateDatabaseId> altDatabases;
+  double? lastWatchDuration;
+  bool preferDubs;
+
+  PlayerDataProvider({
+    required List<VideoStream> initialStreams,
+    required VideoStream initialStream,
+    required this.epLinks,
+    required this.showTitle,
+    required this.selectedSource,
+    required this.showId,
+    required this.startIndex,
+    required this.altDatabases,
+    required this.lastWatchDuration,
+    this.coverImageUrl, // just for presence updation
+    this.preferDubs = false,
+  }) : _state = PlayerDataProviderState(
+         streams: initialStreams,
+         currentStream: initialStream,
+         controlsLocked: false,
+         qualities: [],
+         currentQuality: QualityStream.paceholder(),
+         audioTracks: [],
+         currentAudioTrack: AudioStream.placeholder(),
+         currentEpIndex: startIndex,
+         preloadStarted: false,
+         preloadedSources: [],
+         currentTimeStamp: '00:00',
+         maxTimeStamp: '00:00',
+         preferredServer: selectedSource,
+         sliderValue: 0,
+       );
+
+  PlayerDataProviderState get state => _state;
+
+  late SubtitleSettings subtitleSettings;
+
+
+  void initSubsettings() => UserPreferences.getUserPreferences().then((val) {
+    subtitleSettings = val.subtitleSettings ?? SubtitleSettings();
+    _state = _state.copyWith(subsInited: true);
+    notifyListeners();
+  });
+
+
+  Future<void> extractCurrentStreamQualities() async {
+    final url = _state.currentStream.url;
+    final headers = _state.currentStream.customHeaders;
+    String? mime;
+    if (!url.contains(
+      RegExp(r'\.(mkv|mp4|mov|webm|dash|m3u|m3u8)', caseSensitive: false),
+    )) {
+
+      mime = await getMediaMimeType(url, headers);
+      print(mime);
+    }
+    try {
+      final master = await parseMasterPlaylist(url, customHeader: headers);
+      _state = _state.copyWith(
+        qualities: master.qualityStreams,
+        audioTracks: master.audioStreams,
+      );
+    } catch (e) {
+
+      _state = _state.copyWith(
+        qualities: [
+          QualityStream(
+            url: url,
+            resolution: 'default',
+            quality: _state.currentStream.quality,
+          ),
+        ],
+      );
+    }
+    notifyListeners();
+    print("Available Qualities: ${state.qualities}");
+  }
+
+
+  QualityStream getPreferredQualityStreamFromQualities() {
+    return _state.qualities
+            .where(
+              (it) =>
+                  it.quality ==
+                  (currentUserSettings?.preferredQuality ?? '720p'),
+            )
+            .firstOrNull ??
+        _state.qualities[0];
+  }
+
+
+  void updateCurrentQuality(QualityStream quality) {
+    _state = _state.copyWith(currentQuality: quality);
+    notifyListeners();
+  }
+
+
+  void updateCurrentAudioTrack(AudioStream track) {
+    _state = _state.copyWith(currentAudioTrack: track);
+    notifyListeners();
+  }
+
+
+  void updateStreams(List<VideoStream> streams) {
+    _state = _state.copyWith(streams: streams);
+    notifyListeners();
+  }
+
+
+  void updateCurrentStream(VideoStream stream) {
+    _state = _state.copyWith(currentStream: stream);
+    notifyListeners();
+  }
+
+
+  void updatePreloadSources(List<VideoStream> sources) {
+    _state = _state.copyWith(preloadedSources: sources);
+    notifyListeners();
+  }
+
+
+  void updateCurrentEpIndex(int newIndex) {
+    _state = _state.copyWith(
+      currentEpIndex: newIndex,
+      preloadStarted: false,
+      preloadedSources: [],
+    );
+    notifyListeners();
+  }
+
+
+  void toggleControlsLock() {
+    _state = _state.copyWith(controlsLocked: !_state.controlsLocked);
+    notifyListeners();
+  }
+
+
+  void updateTimeStamps(String current, String max) {
+    _state = _state.copyWith(currentTimeStamp: current, maxTimeStamp: max);
+    notifyListeners();
+  }
+
+
+  void updateSliderValue(int val) {
+    _state = _state.copyWith(sliderValue: val);
+    notifyListeners();
+  }
+
+
+  void preloadNextEpisode() async {
+
+    if (_state.currentEpIndex + 1 >= epLinks.length) {
+      _state = _state.copyWith(
+        preloadStarted:
+            true, // setting to true to avoid unwanted repeated calls
+      );
+      return;
+    }
+
+    _state = _state.copyWith(preloadStarted: true, preloadedSources: []);
+
+    final index = _state.currentEpIndex + 1 == epLinks.length
+        ? null
+        : _state.currentEpIndex + 1;
+    if (index == null) {
+      print("On the final episode. No preloads available");
+      return;
+    }
+    List<VideoStream> srcs = [];
+
+    await SourceManager.instance.getStreams(
+      selectedSource,
+      epLinks[index].episodeLink,
+      dub: preferDubs,
+      metadata: epLinks[index].metadata,
+      (list, finished) {
+        srcs = srcs + list;
+        if (finished) {
+          _state = _state.copyWith(preloadedSources: srcs);
+          print("[PlAYER] PRELOAD FINISHED FOUND ${srcs.length} SERVERS");
+        }
+      },
+    );
+  }
+
+
+  Future<void> getSkipTimesForCurrentEpisode({double videoDuration = 0}) async {
+    final malId = altDatabases
+        .where((element) => element.database == Databases.mal)
+        .firstOrNull
+        ?.id;
+    if (malId == null) {
+      Logs.player.log("No MAL id found for skip times");
+      return;
+    }
+    final episodeNumber = epLinks[_state.currentEpIndex].episodeNumber;
+    final skipTimes = await AniSkip().getSkipTimes(
+      malId,
+      episodeNumber,
+      episodeLength: videoDuration / 1000,
+    );
+
+    if (skipTimes == null) {
+      Logs.player.log("No skip times found");
+      return;
+    }
+
+    _state = _state.copyWith(opSkip: skipTimes.op, edSkip: skipTimes.ed);
+  }
+
+
+  void updateSubtitleSettings(SubtitleSettings settings) {
+    subtitleSettings = settings;
+  }
+
+
+  void update(PlayerDataProviderState newState) {
+    _state = newState;
+    notifyListeners();
+  }
+}
+
+class PlayerDataProviderState {
+
+  final List<VideoStream> streams;
+
+
+  final VideoStream currentStream;
+
+
+  final bool controlsLocked;
+
+
+  final List<QualityStream> qualities;
+
+
+  final QualityStream currentQuality;
+
+
+  final List<AudioStream> audioTracks;
+
+
+  final AudioStream currentAudioTrack;
+
+
+  final int currentEpIndex;
+
+
+  final bool preloadStarted;
+
+
+  final List<VideoStream> preloadedSources;
+
+
+  final String currentTimeStamp;
+
+
+  final String maxTimeStamp;
+
+
+  final String preferredServer;
+
+
+  final int sliderValue;
+
+
+  final bool subsInited;
+
+
+  final SkipInterval? opSkip;
+
+
+  final SkipInterval? edSkip;
+
+  PlayerDataProviderState({
+    required this.streams,
+    required this.currentStream,
+    required this.controlsLocked,
+    required this.qualities,
+    required this.currentQuality,
+    required this.currentEpIndex,
+    required this.preloadStarted,
+    required this.preloadedSources,
+    required this.currentTimeStamp,
+    required this.maxTimeStamp,
+    required this.preferredServer,
+    required this.sliderValue,
+    required this.audioTracks,
+    required this.currentAudioTrack,
+    this.subsInited = false,
+    this.opSkip = null,
+    this.edSkip = null,
+  });
+
+  PlayerDataProviderState copyWith({
+    List<VideoStream>? streams,
+    VideoStream? currentStream,
+    bool? controlsLocked,
+    bool? controlsVisible,
+    bool? wakelockEnabled,
+    List<QualityStream>? qualities,
+    QualityStream? currentQuality,
+    int? currentEpIndex,
+    bool? preloadStarted,
+    List<VideoStream>? preloadedSources,
+    String? currentTimeStamp,
+    String? maxTimeStamp,
+    String? preferredServer,
+    int? sliderValue,
+    bool? subsInited,
+    List<AudioStream>? audioTracks,
+    AudioStream? currentAudioTrack,
+    SkipInterval? opSkip,
+    SkipInterval? edSkip,
+  }) {
+    return PlayerDataProviderState(
+      streams: streams ?? this.streams,
+      currentStream: currentStream ?? this.currentStream,
+      controlsLocked: controlsLocked ?? this.controlsLocked,
+      qualities: qualities ?? this.qualities,
+      currentQuality: currentQuality ?? this.currentQuality,
+      currentEpIndex: currentEpIndex ?? this.currentEpIndex,
+      preloadStarted: preloadStarted ?? this.preloadStarted,
+      preloadedSources: preloadedSources ?? this.preloadedSources,
+      currentTimeStamp: currentTimeStamp ?? this.currentTimeStamp,
+      maxTimeStamp: maxTimeStamp ?? this.maxTimeStamp,
+      preferredServer: preferredServer ?? this.preferredServer,
+      sliderValue: sliderValue ?? this.sliderValue,
+      subsInited: subsInited ?? this.subsInited,
+      audioTracks: audioTracks ?? this.audioTracks,
+      currentAudioTrack: currentAudioTrack ?? this.currentAudioTrack,
+      opSkip: opSkip ?? this.opSkip,
+      edSkip: edSkip ?? this.edSkip,
+    );
+  }
+}
+
+class ViewMode {
+  final IconData icon;
+  final String desc;
+  final BoxFit value;
+
+  ViewMode({required this.icon, required this.desc, required this.value});
+
+  static ViewMode get fit => viewModes[0];
+
+  static ViewMode get filled => viewModes[1];
+
+  static ViewMode get cropped => viewModes[2];
+}
+
+final List<ViewMode> viewModes = [
+  ViewMode(icon: Icons.fullscreen, desc: "fit", value: BoxFit.contain),
+  ViewMode(
+    icon: Icons.zoom_out_map_rounded,
+    desc: "filled",
+    value: BoxFit.fill,
+  ),
+  ViewMode(icon: Icons.crop_outlined, desc: "cropped", value: BoxFit.cover),
+];
