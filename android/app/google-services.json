@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "480772726536",
+    "project_id": "mantax-e0919",
+    "storage_bucket": "mantax-e0919.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:480772726536:android:d595b75f28caa6600556bd",
+        "android_client_info": {
+          "package_name": "com.love.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxKm2Q_frvYWHUMM5rfsNWHC7CcWFTBRQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:480772726536:android:1525f380acc716950556bd",
+        "android_client_info": {
+          "package_name": "com.manta.ayun"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxKm2Q_frvYWHUMM5rfsNWHC7CcWFTBRQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
