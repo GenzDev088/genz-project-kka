@@ -1,0 +1,181 @@
+name: otax
+description: "Aplikasi Bug Dan Banyak Fitur"
+publish_to: 'none'
+version: 2.0.9+2
+
+environment:
+  sdk: ">=3.8.1 <4.0.0"
+  flutter: ">=3.7.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Network, parsing, cryptographic deps
+  http: ^1.2.2
+  graphql: ^5.1.3
+  html: ^0.15.6
+  encrypt: ^5.0.3
+  js_unpack: ^1.0.4
+  url_launcher: ^6.3.1
+  flutter_web_auth_2: ^5.0.2
+  crypto: ^3.0.6
+  web_socket_channel: ^2.4.0
+  network_info_plus: ^4.1.0
+  dio: ^5.7.0
+  connectivity_plus: ^6.1.3
+  local_auth: ^2.3.0
+  intl: ^0.20.2
+  path_provider: ^2.1.5
+  # Core utils
+  awesome_notifications: ^0.11.0
+  package_info_plus: ^9.0.0
+  permission_handler: ^11.3.0
+  device_info_plus: ^11.5.0
+  provider: ^6.1.2
+  file_picker: ^10.2.0
+  record: ^5.2.1
+  archive: ^4.0.9
+  dynamic_color: ^1.7.0
+  app_links: ^7.0.0
+  cupertino_icons: ^1.0.8
+  shared_preferences: ^2.2.2
+  wakelock_plus: ^1.4.0
+  # Local storage
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  flutter_secure_storage: ^10.0.0
+  flutter_svg: ^2.1.0
+  dartssh2: ^2.9.1
+  # Media and player related
+  just_audio: ^0.10.1
+  video_player: ^2.9.2
+  audioplayers: ^6.5.1
+  chewie: ^1.5.2
+  youtube_explode_dart: ^2.5.3
+  flutter_background_service: ^5.0.5
+  flutter_local_notifications: ^17.2.4
+  better_player:
+    git:
+      url: https://github.com/frostnova721/betterplayer.git
+  video_player_win: ^3.1.1
+
+  # UI
+  pull_to_refresh: ^2.0.0
+  flutter_markdown_plus: ^1.0.7
+  desktop_webview_window: ^0.2.3
+  cached_network_image: ^3.4.1
+  shimmer: ^3.0.0
+  webview_flutter: ^4.4.2
+  font_awesome_flutter: 11.0.0
+  flutter_animate: ^4.5.2
+  iconsax: ^0.0.8
+  carousel_slider: ^5.1.1
+  flutter_cache_manager: ^3.4.1
+  window_manager:
+    git:
+      url: https://github.com/YuiHrsw/window_manager.git
+      path: packages/window_manager
+      ref: windows_fullscreen_fix
+
+  # Misc
+  flutter_native_splash: ^2.4.7
+  share_plus: ^12.0.2
+  clipboard: ^0.1.3
+  geolocator: ^10.1.0
+  geocoding: ^2.1.1
+  flutter_downloader: ^1.11.6
+  percent_indicator: ^4.2.3
+  flutter_foreground_task: ^9.2.0
+  fluttertoast: ^9.0.0
+  image_gallery_saver_plus: ^4.0.1
+  flutter_vpn_service:
+    git:
+      url: https://github.com/shafiquecbl/flutter_vpn_service.git
+  commentum_client:
+    git:
+      url: https://github.com/commentum/commentum_client
+  mailer: ^7.1.0
+  wifi_scan: ^0.4.1+2
+  wifi_iot: ^0.3.19+2
+  fl_chart: ^1.2.0
+
+  # TabunganKu dependencies
+  flutter_riverpod: ^2.4.9
+  riverpod_annotation: ^2.3.3
+  google_fonts: 8.0.2
+  go_router: ^11.1.2
+  freezed_annotation: ^2.4.1
+  json_annotation: ^4.8.1
+  timezone: ^0.9.4
+  flutter_timezone: ^5.0.2
+  image_picker: ^1.0.7
+  google_mlkit_text_recognition: ^0.15.1
+  flutter_native_contact_picker: ^0.0.11
+  uuid: ^4.3.3
+  pdf: ^3.10.7
+  open_filex: ^4.4.0
+  firebase_core: ^4.9.0
+  firebase_messaging: ^16.2.2
+  cloud_firestore: ^6.2.0
+  firebase_storage: ^13.2.0
+  google_generative_ai: ^0.4.7
+  flutter_markdown: ^0.7.7+1
+  firebase_database: ^12.4.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: ^0.14.4
+  flutter_lints: ^5.0.0
+  flutter_inappwebview: ^6.0.0
+  riverpod_generator: ^2.3.9
+  build_runner: ^2.4.8
+  freezed: ^2.4.1
+  json_serializable: ^6.7.1
+
+dependency_overrides:
+  record_platform_interface: 1.2.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/
+    - assets/images/
+    - assets/fonts/
+    - assets/videos/
+    - lib/assets/fonts/
+    
+  fonts:
+    - family: Orbitron
+      fonts:
+        - asset: fonts/Rajdhani-Regular.ttf
+
+    - family: ShareTechMono
+      fonts:
+        - asset: fonts/Rajdhani-Regular.ttf
+
+    - family: Debrosee
+      fonts:
+        - asset: fonts/Rajdhani-Regular.ttf
+
+    - family: Aloevera
+      fonts:
+        - asset: fonts/Aloevera-OVoWO.ttf
+        
+    - family: Aktura
+      fonts:
+        - asset: fonts/Aktura-Regular.ttf
+        
+    - family: Uthmanic
+      fonts:
+        - asset: fonts/Uthmanic.ttf
+
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700
