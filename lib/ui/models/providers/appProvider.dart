@@ -1,0 +1,136 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+
+import 'package:otax/core/app/runtimeDatas.dart';
+import 'package:otax/core/data/theme.dart';
+import 'package:otax/ui/theme/themes.dart';
+import 'package:otax/ui/theme/types.dart';
+import 'package:flutter/material.dart';
+import 'package:window_manager/window_manager.dart';
+
+
+class AppProvider with ChangeNotifier {
+  AnimeStreamTheme _theme = appTheme;
+
+  bool _isDark = currentUserSettings?.darkMode ?? false;
+
+  AnimeStreamTheme get theme => _theme;
+
+  bool get isDark => _isDark;
+
+  bool _isFullScreen = false;
+
+  bool get isFullScreen => _isFullScreen;
+
+  String _windowTitle = "animestream";
+
+  String get windowTitle => _windowTitle;
+
+  Color? _titleBarColor = null;
+
+  Color? get titleBarColor => _titleBarColor;
+
+
+  bool _showTitleBar = false;
+
+  bool get showTitleBar => _showTitleBar;
+
+  set showTitleBar(bool pip) {
+    _showTitleBar = pip;
+    notifyListeners();
+  }
+
+  set windowTitle(String newTitle) {
+    _windowTitle = newTitle;
+    notifyListeners();
+  }
+
+  set isFullScreen(bool fs) {
+    _isFullScreen = fs;
+    notifyListeners();
+  }
+
+  set theme(AnimeStreamTheme selectedTheme) {
+    _theme = selectedTheme;
+
+    final dark = currentUserSettings?.darkMode ?? true;
+
+    appTheme = AnimeStreamTheme(
+      accentColor: selectedTheme.accentColor,
+
+      backgroundColor:
+          ((currentUserSettings?.amoledBackground ?? false) && dark)
+          ? Colors.black
+          : selectedTheme.backgroundColor,
+      backgroundSubColor: selectedTheme.backgroundSubColor,
+      textMainColor: selectedTheme.textMainColor,
+      textSubColor: selectedTheme.textSubColor,
+      modalSheetBackgroundColor: selectedTheme.modalSheetBackgroundColor,
+      onAccent: selectedTheme.onAccent,
+    );
+
+    notifyListeners();
+  }
+
+  set isDark(bool dark) {
+    _isDark = dark;
+  }
+
+
+
+  void setTitlebarColor(Color? color) {
+    _titleBarColor = color;
+    notifyListeners();
+  }
+
+  void applyTheme(AnimeStreamTheme t) {
+    theme = t;
+  }
+
+  Future<void> applyThemeMode(bool dark) async {
+    isDark = dark;
+    final themeId = await getTheme();
+    final theme = availableThemes.firstWhere(
+      (thm) => thm.id == themeId,
+      orElse: () => availableThemes[0],
+    );
+
+    if (dark) {
+      appTheme = AnimeStreamTheme(
+        accentColor: theme.theme.accentColor,
+        backgroundColor: (currentUserSettings?.amoledBackground ?? false)
+            ? Colors.black
+            : theme.theme.backgroundColor,
+        backgroundSubColor: theme.theme.backgroundSubColor,
+        textMainColor: theme.theme.textMainColor,
+        textSubColor: theme.theme.textSubColor,
+        modalSheetBackgroundColor: theme.theme.modalSheetBackgroundColor,
+        onAccent: theme.theme.onAccent,
+      );
+    } else {
+      appTheme = AnimeStreamTheme(
+        accentColor: theme.lightVariant.accentColor,
+        backgroundColor: theme.lightVariant.backgroundColor,
+        backgroundSubColor: theme.lightVariant.backgroundSubColor,
+        textMainColor: theme.lightVariant.textMainColor,
+        textSubColor: theme.lightVariant.textSubColor,
+        modalSheetBackgroundColor: theme.lightVariant.modalSheetBackgroundColor,
+        onAccent: theme.lightVariant.onAccent,
+      );
+    }
+
+    notifyListeners();
+  }
+
+
+  void justRefresh() {
+    notifyListeners();
+  }
+
+
+  Future<void> setFullScreen(bool fs) async {
+    if (kIsWeb || Platform.isAndroid) return;
+    await windowManager.setFullScreen(fs);
+    isFullScreen = fs;
+  }
+}
