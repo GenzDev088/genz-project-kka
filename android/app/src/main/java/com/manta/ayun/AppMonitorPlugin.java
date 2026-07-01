@@ -1,4 +1,4 @@
-package com.manta.ayun;
+package com.donzii.genzz;
 
 import android.app.Activity;
 import android.app.ActivityManager;
