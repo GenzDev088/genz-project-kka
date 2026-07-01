@@ -1,4 +1,4 @@
-package com.manta.ayun;
+package com.donzii.genzz;
 
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
