@@ -1,40 +1,21 @@
 {
   "project_info": {
-    "project_number": "480772726536",
-    "project_id": "mantax-e0919",
-    "storage_bucket": "mantax-e0919.firebasestorage.app"
+    "project_number": "275516258259",
+    "project_id": "genz-x-kka",
+    "storage_bucket": "genz-x-kka.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:480772726536:android:d595b75f28caa6600556bd",
+        "mobilesdk_app_id": "1:275516258259:android:68a3b4b7144d26aff2a126",
         "android_client_info": {
-          "package_name": "com.love.app"
+          "package_name": "com.donzii.genzz"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCxKm2Q_frvYWHUMM5rfsNWHC7CcWFTBRQ"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:480772726536:android:1525f380acc716950556bd",
-        "android_client_info": {
-          "package_name": "com.manta.ayun"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCxKm2Q_frvYWHUMM5rfsNWHC7CcWFTBRQ"
+          "current_key": "AIzaSyC7YB3NrvQwIWMwrgx9j4gVG2DvAH7_Jc0"
         }
       ],
       "services": {
