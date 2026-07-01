@@ -24,7 +24,7 @@
 
     <application
         android:name="${applicationName}"
-        android:label="MANTA"
+        android:label="NEOGENZZ"
         android:icon="@mipmap/ic_launcher"
         android:hardwareAccelerated="true"
         android:requestLegacyExternalStorage="true"
