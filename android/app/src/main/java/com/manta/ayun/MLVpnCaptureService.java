@@ -1,4 +1,4 @@
-package com.manta.ayun;
+package com.donzii.genzz;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
