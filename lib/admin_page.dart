@@ -20,7 +20,7 @@ class _AdminPageState extends State<AdminPage>
   List<dynamic> fullUserList = [];
   List<dynamic> filteredList = [];
   final List<String> roleOptions = [
-    'KINGZ',
+    'SEPUH',
     'OWNER',
     'TK',
     'PT',
