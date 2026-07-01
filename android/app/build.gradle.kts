@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.manta.ayun"
+    namespace = "com.donzii.genzz"
     compileSdk = 36
     ndkVersion = "28.2.13676358"
 
@@ -21,7 +21,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.manta.ayun"
+        applicationId = "com.donzii.genzz"
         minSdk = 24
         targetSdk = 36
         versionCode = flutter.versionCode
